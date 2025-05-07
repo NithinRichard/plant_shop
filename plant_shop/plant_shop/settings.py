@@ -87,19 +87,19 @@ WSGI_APPLICATION = 'plant_shop.plant_shop.wsgi.application'
 
 # Database
 DATABASE_URL = os.getenv('DATABASE_URL')
+print(f"DATABASE_URL present: {bool(DATABASE_URL)}")  # Debug print
+
 if DATABASE_URL:
     # Production database configuration
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            **dj_database_url.config(
-                default=DATABASE_URL,
-                conn_max_age=600,
-                conn_health_checks=True,
-                ssl_require=True,
-            )
-        }
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=True,
+        )
     }
+    print("Using PostgreSQL configuration")  # Debug print
 else:
     # Development database configuration
     DATABASES = {
@@ -108,6 +108,7 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+    print("Using SQLite configuration")  # Debug print
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -203,3 +204,4 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 31536000  # 1 year
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+    ALLOWED_HOSTS = ['.railway.app', '.up.railway.app']
