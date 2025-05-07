@@ -96,6 +96,10 @@ if not DEBUG:
             'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
             'HOST': os.getenv('POSTGRES_HOST', ''),
             'PORT': os.getenv('POSTGRES_PORT', '5432'),
+            'OPTIONS': {
+                'sslmode': 'require',
+                'connect_timeout': 10,
+            },
         }
     }
     
@@ -105,7 +109,12 @@ if not DEBUG:
             default=os.environ['DATABASE_URL'],
             conn_max_age=600,
             conn_health_checks=True,
-            ssl_require=True
+            ssl_require=True,
+            engine='django.db.backends.postgresql',
+            options={
+                'sslmode': 'require',
+                'connect_timeout': 10,
+            }
         )
 else:
     # Development database configuration
