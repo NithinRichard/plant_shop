@@ -29,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-!dgw6vpn55$npm8tby8ib+y&f5rir+x*vl^ex(0t9@bndi1=^=')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True  # Temporarily set to True for debugging
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ['*']  # Update this with your domain in production
 
@@ -86,17 +86,29 @@ TEMPLATES = [
 WSGI_APPLICATION = 'plant_shop.plant_shop.wsgi.application'
 
 # Database
-DATABASE_URL = os.getenv('DATABASE_URL')
-if DATABASE_URL:
+if not DEBUG:
+    # Production database configuration
     DATABASES = {
-        'default': dj_database_url.config(
-            default=DATABASE_URL,
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('POSTGRES_DB', 'angels_plant'),
+            'USER': os.getenv('POSTGRES_USER', 'angels_plant_user'),
+            'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
+            'HOST': os.getenv('POSTGRES_HOST', ''),
+            'PORT': os.getenv('POSTGRES_PORT', '5432'),
+        }
+    }
+    
+    # If DATABASE_URL is provided, use it instead
+    if 'DATABASE_URL' in os.environ:
+        DATABASES['default'] = dj_database_url.config(
+            default=os.environ['DATABASE_URL'],
             conn_max_age=600,
             conn_health_checks=True,
             ssl_require=True
         )
-    }
 else:
+    # Development database configuration
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
