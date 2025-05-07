@@ -3,7 +3,7 @@ builder = "nixpacks"
 buildCommand = "pip install -r requirements.txt"
 
 [deploy]
-startCommand = "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn plant_shop.plant_shop.wsgi:application --bind 0.0.0.0:$PORT --log-level debug --access-logfile - --error-logfile -"
+startCommand = "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn -c gunicorn.conf.py plant_shop.plant_shop.wsgi:application"
 healthcheckPath = "/admin/"
 healthcheckTimeout = 300
 healthcheckInterval = 30
