@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'plant_shop.plant_shop.wsgi.application'
 
 # Database
 DATABASE_URL = os.getenv('DATABASE_URL')
-if DATABASE_URL and not DEBUG:
+if DATABASE_URL:
     # Production database configuration
     DATABASES = {
         'default': {
@@ -135,6 +135,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Create staticfiles directory if it doesn't exist
+if not os.path.exists(STATIC_ROOT):
+    os.makedirs(STATIC_ROOT)
 
 # Media files
 MEDIA_URL = '/media/'
