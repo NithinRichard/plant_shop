@@ -89,33 +89,14 @@ WSGI_APPLICATION = 'plant_shop.plant_shop.wsgi.application'
 if not DEBUG:
     # Production database configuration
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('POSTGRES_DB', 'angels_plant'),
-            'USER': os.getenv('POSTGRES_USER', 'angels_plant_user'),
-            'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
-            'HOST': os.getenv('POSTGRES_HOST', ''),
-            'PORT': os.getenv('POSTGRES_PORT', '5432'),
-            'OPTIONS': {
-                'sslmode': 'require',
-                'connect_timeout': 10,
-            },
-        }
-    }
-    
-    # If DATABASE_URL is provided, use it instead
-    if 'DATABASE_URL' in os.environ:
-        DATABASES['default'] = dj_database_url.config(
-            default=os.environ['DATABASE_URL'],
+        'default': dj_database_url.config(
+            default=os.getenv('DATABASE_URL'),
             conn_max_age=600,
             conn_health_checks=True,
             ssl_require=True,
             engine='django.db.backends.postgresql',
-            options={
-                'sslmode': 'require',
-                'connect_timeout': 10,
-            }
         )
+    }
 else:
     # Development database configuration
     DATABASES = {
