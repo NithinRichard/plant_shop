@@ -86,16 +86,19 @@ TEMPLATES = [
 WSGI_APPLICATION = 'plant_shop.plant_shop.wsgi.application'
 
 # Database
-if not DEBUG:
+DATABASE_URL = os.getenv('DATABASE_URL')
+if DATABASE_URL and not DEBUG:
     # Production database configuration
     DATABASES = {
-        'default': dj_database_url.config(
-            default=os.getenv('DATABASE_URL'),
-            conn_max_age=600,
-            conn_health_checks=True,
-            ssl_require=True,
-            engine='django.db.backends.postgresql',
-        )
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            **dj_database_url.config(
+                default=DATABASE_URL,
+                conn_max_age=600,
+                conn_health_checks=True,
+                ssl_require=True,
+            )
+        }
     }
 else:
     # Development database configuration
