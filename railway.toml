@@ -3,9 +3,11 @@ builder = "nixpacks"
 buildCommand = "pip install -r requirements.txt"
 
 [deploy]
-startCommand = "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn plant_shop.plant_shop.wsgi:application --bind 0.0.0.0:$PORT"
-healthcheckPath = "/"
-healthcheckTimeout = 100
+startCommand = "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn plant_shop.plant_shop.wsgi:application --bind 0.0.0.0:$PORT --log-level debug --access-logfile - --error-logfile -"
+healthcheckPath = "/admin/"
+healthcheckTimeout = 300
+healthcheckInterval = 30
 
 [deploy.env]
-PYTHON_VERSION = "3.9.0" 
+PYTHON_VERSION = "3.9.0"
+DJANGO_SETTINGS_MODULE = "plant_shop.plant_shop.settings" 
