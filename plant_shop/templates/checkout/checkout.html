@@ -1,0 +1,501 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #2ecc71;
+        --secondary-color: #27ae60;
+        --text-color: #2c3e50;
+        --light-gray: #f8f9fa;
+        --border-color: #e9ecef;
+    }
+
+    body {
+        background-color: var(--light-gray);
+        color: var(--text-color);
+    }
+
+    .checkout-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .checkout-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .checkout-header h1 {
+        font-size: 2.5rem;
+        color: var(--text-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .checkout-header p {
+        color: #6c757d;
+        font-size: 1.1rem;
+    }
+
+    .checkout-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+
+    .checkout-card-header {
+        background: var(--primary-color);
+        color: white;
+        padding: 1.5rem;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .checkout-card-body {
+        padding: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: var(--text-color);
+    }
+
+    .form-control {
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.25);
+    }
+
+    .payment-method {
+        background: var(--light-gray);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .payment-method-label {
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .payment-option {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .payment-option:hover {
+        border-color: var(--primary-color);
+    }
+
+    .payment-option.selected {
+        border-color: var(--primary-color);
+        background-color: rgba(46, 204, 113, 0.1);
+    }
+
+    .payment-option input[type="radio"] {
+        margin-right: 1rem;
+    }
+
+    .payment-option-label {
+        font-weight: 500;
+    }
+
+    .StripeElement {
+        box-sizing: border-box;
+        height: 50px;
+        padding: 12px 16px;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        background-color: white;
+        transition: all 0.3s ease;
+    }
+
+    .StripeElement--focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.25);
+    }
+
+    .StripeElement--invalid {
+        border-color: #dc3545;
+    }
+
+    #card-errors {
+        color: #dc3545;
+        margin-top: 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    .btn-pay {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .btn-pay:hover {
+        background-color: var(--secondary-color);
+        transform: translateY(-1px);
+    }
+
+    .btn-pay:disabled {
+        background-color: #6c757d;
+        cursor: not-allowed;
+    }
+
+    .order-summary {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .order-summary-header {
+        background: var(--primary-color);
+        color: white;
+        padding: 1.5rem;
+        font-size: 1.25rem;
+        font-weight: 600;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .order-summary-body {
+        padding: 1.5rem;
+    }
+
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .order-item:last-child {
+        border-bottom: none;
+    }
+
+    .order-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 0 0;
+        margin-top: 1rem;
+        border-top: 2px solid var(--border-color);
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .spinner {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+        margin-left: 0.5rem;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    #razorpay-pay-button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+
+    #razorpay-pay-button:hover {
+        background-color: var(--secondary-color);
+        transform: translateY(-1px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="checkout-container">
+    <div class="checkout-header">
+        <h1>Checkout</h1>
+        <p>Complete your purchase securely</p>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="checkout-card">
+                <div class="checkout-card-header">
+                    Shipping Information
+                </div>
+                <div class="checkout-card-body">
+                    <form id="payment-form" method="post">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">First Name</label>
+                                    {{ form.first_name }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Last Name</label>
+                                    {{ form.last_name }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            {{ form.email }}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Address</label>
+                            {{ form.address }}
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">City</label>
+                                    {{ form.city }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Postal Code</label>
+                                    {{ form.postal_code }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="payment-method">
+                            <label class="payment-method-label">Payment Method</label>
+                            <div class="payment-option" onclick="document.getElementById('stripe').click()">
+                                <input type="radio" name="payment_method" id="stripe" value="stripe" checked>
+                                <label class="payment-option-label" for="stripe">
+                                    Credit Card (Stripe)
+                                </label>
+                            </div>
+                            <div class="payment-option" onclick="document.getElementById('razorpay').click()">
+                                <input type="radio" name="payment_method" id="razorpay" value="razorpay">
+                                <label class="payment-option-label" for="razorpay">
+                                    RuPay / UPI / Net Banking (Razorpay)
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div id="stripe-payment-element" class="mb-4">
+                            <div id="card-element"></div>
+                            <div id="card-errors" class="text-danger mt-2"></div>
+                        </div>
+                        
+                        <div id="razorpay-button" style="display: none;">
+                            <button type="button" id="razorpay-pay-button" class="btn-pay">
+                                Pay with Razorpay
+                            </button>
+                        </div>
+                        
+                        <button type="submit" class="btn-pay" id="submit-button">
+                            <span id="button-text">Pay Now</span>
+                            <div id="spinner" class="spinner hidden"></div>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="order-summary">
+                <div class="order-summary-header">
+                    Order Summary
+                </div>
+                <div class="order-summary-body">
+                    {% for item in cart %}
+                    <div class="order-item">
+                        <div>
+                            <strong>{{ item.quantity }}x</strong> {{ item.plant.name }}
+                        </div>
+                        <div>
+                            ${{ item.total_price }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="order-total">
+                        <div>Total</div>
+                        <div>${{ cart.get_total_price }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stripe JS -->
+<script src="https://js.stripe.com/v3/"></script>
+<!-- Razorpay JS -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+    // Get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // Initialize Stripe
+    const stripe = Stripe('{{ stripe_public_key }}');
+    const elements = stripe.elements();
+    const cardElement = elements.create('card');
+    cardElement.mount('#card-element');
+    
+    // Handle payment method selection
+    document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            // Update payment option styling
+            document.querySelectorAll('.payment-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            this.closest('.payment-option').classList.add('selected');
+            
+            if (this.value === 'stripe') {
+                document.getElementById('stripe-payment-element').style.display = 'block';
+                document.getElementById('razorpay-button').style.display = 'none';
+                document.getElementById('submit-button').style.display = 'block';
+            } else {
+                document.getElementById('stripe-payment-element').style.display = 'none';
+                document.getElementById('razorpay-button').style.display = 'block';
+                document.getElementById('submit-button').style.display = 'none';
+            }
+        });
+    });
+
+    // Handle Razorpay payment
+    async function handleRazorpayPayment() {
+        const form = document.getElementById('payment-form');
+        const formData = new FormData(form);
+        formData.append('payment_method', 'razorpay');
+        
+        try {
+            const response = await fetch('{% url "checkout:checkout" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            
+            const options = {
+                key: '{{ razorpay_key_id }}',
+                amount: data.amount,
+                currency: data.currency,
+                order_id: data.razorpay_order_id,
+                name: 'Angel\'s Plant Shop',
+                description: 'Plant Purchase',
+                handler: function (response) {
+                    window.location.href = `{% url "checkout:checkout_success" %}?razorpay_payment_id=${response.razorpay_payment_id}&razorpay_order_id=${response.razorpay_order_id}&razorpay_signature=${response.razorpay_signature}`;
+                },
+                prefill: {
+                    name: formData.get('first_name') + ' ' + formData.get('last_name'),
+                    email: formData.get('email')
+                },
+                theme: {
+                    color: '#2ecc71'
+                }
+            };
+            
+            const rzp = new Razorpay(options);
+            rzp.open();
+            
+        } catch (error) {
+            console.error('Error:', error);
+            alert(error.message);
+        }
+    }
+    
+    // Add click handler for Razorpay button
+    document.getElementById('razorpay-pay-button').addEventListener('click', handleRazorpayPayment);
+    
+    // Handle form submission (for Stripe)
+    const form = document.getElementById('payment-form');
+    const submitButton = document.getElementById('submit-button');
+    
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        
+        const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+        
+        if (paymentMethod === 'stripe') {
+            submitButton.disabled = true;
+            document.getElementById('spinner').classList.remove('hidden');
+            
+            // Handle Stripe payment
+            const { error } = await stripe.confirmPayment({
+                elements,
+                confirmParams: {
+                    return_url: `${window.location.origin}/checkout/success/`,
+                }
+            });
+            
+            if (error) {
+                const errorElement = document.getElementById('card-errors');
+                errorElement.textContent = error.message;
+                submitButton.disabled = false;
+                document.getElementById('spinner').classList.add('hidden');
+            }
+        }
+    });
+</script>
+{% endblock %} 

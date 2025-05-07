@@ -1,0 +1,3 @@
+"""
+Plant Shop package initialization.
+""" 

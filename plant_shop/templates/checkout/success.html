@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Order Confirmation - Angel's Plant Shop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                    <h1 class="mt-4">Thank You for Your Order!</h1>
+                    <p class="lead">Your order has been successfully placed and confirmed.</p>
+                    
+                    <div class="alert alert-success mt-4">
+                        <h5>Order Details</h5>
+                        <p class="mb-1">Order Number: #{{ order.id }}</p>
+                        <p class="mb-1">Total Amount: ${{ order.get_total_cost }}</p>
+                        <p class="mb-0">A confirmation email has been sent to {{ order.email }}</p>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h5>Shipping Information</h5>
+                        <p class="mb-1">{{ order.first_name }} {{ order.last_name }}</p>
+                        <p class="mb-1">{{ order.address }}</p>
+                        <p class="mb-1">{{ order.city }}, {{ order.state }} {{ order.zip_code }}</p>
+                        <p class="mb-0">{{ order.phone }}</p>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h5>What's Next?</h5>
+                        <p>We'll process your order and ship it as soon as possible. You'll receive an email with tracking information once your order ships.</p>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'products:plant_list' %}" class="btn btn-primary me-2">
+                            Continue Shopping
+                        </a>
+                        <a href="{% url 'core:home' %}" class="btn btn-outline-secondary">
+                            Return to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}Plants - Angel's Plant Shop{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Filters Sidebar -->
+    <div class="col-md-3">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Filters</h5>
+            </div>
+            <div class="card-body">
+                <form method="get">
+                    <!-- Care Level Filter -->
+                    <div class="mb-3">
+                        <label class="form-label">Care Level</label>
+                        <select name="care_level" class="form-select">
+                            <option value="">All Levels</option>
+                            <option value="easy" {% if request.GET.care_level == 'easy' %}selected{% endif %}>Easy</option>
+                            <option value="medium" {% if request.GET.care_level == 'medium' %}selected{% endif %}>Medium</option>
+                            <option value="hard" {% if request.GET.care_level == 'hard' %}selected{% endif %}>Hard</option>
+                        </select>
+                    </div>
+
+                    <!-- Light Requirement Filter -->
+                    <div class="mb-3">
+                        <label class="form-label">Light Requirement</label>
+                        <select name="light" class="form-select">
+                            <option value="">All Light Levels</option>
+                            <option value="low" {% if request.GET.light == 'low' %}selected{% endif %}>Low Light</option>
+                            <option value="medium" {% if request.GET.light == 'medium' %}selected{% endif %}>Medium Light</option>
+                            <option value="high" {% if request.GET.light == 'high' %}selected{% endif %}>Bright Light</option>
+                        </select>
+                    </div>
+
+                    <!-- Pet Friendly Filter -->
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" name="pet_friendly" class="form-check-input" id="petFriendly" {% if request.GET.pet_friendly %}checked{% endif %}>
+                            <label class="form-check-label" for="petFriendly">Pet Friendly</label>
+                        </div>
+                    </div>
+
+                    <!-- Sort Options -->
+                    <div class="mb-3">
+                        <label class="form-label">Sort By</label>
+                        <select name="sort" class="form-select">
+                            <option value="name" {% if request.GET.sort == 'name' %}selected{% endif %}>Name</option>
+                            <option value="price_low" {% if request.GET.sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                            <option value="price_high" {% if request.GET.sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                            <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>Newest First</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">Apply Filters</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Categories</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="{% url 'products:plant_list' %}" class="list-group-item list-group-item-action {% if not category %}active{% endif %}">
+                    All Plants
+                </a>
+                {% for cat in categories %}
+                <a href="{% url 'products:category_detail' cat.slug %}" class="list-group-item list-group-item-action {% if category.slug == cat.slug %}active{% endif %}">
+                    {{ cat.name }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Plant List -->
+    <div class="col-md-9">
+        {% if category %}
+        <h1 class="mb-4">{{ category.name }}</h1>
+        {% else %}
+        <h1 class="mb-4">All Plants</h1>
+        {% endif %}
+
+        {% if plants %}
+        <div class="row">
+            {% for plant in plants %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    {% if plant.image %}
+                    <img src="{{ plant.image.url }}" class="card-img-top" alt="{{ plant.name }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ plant.name }}</h5>
+                        <p class="card-text">
+                            {% if plant.is_on_sale %}
+                            <span class="text-decoration-line-through text-muted">${{ plant.original_price }}</span>
+                            {% endif %}
+                            <span class="text-success fw-bold">${{ plant.price }}</span>
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{% url 'products:plant_detail' plant.slug %}" class="btn btn-outline-success">View Details</a>
+                            {% if plant.stock > 0 %}
+                            <span class="badge bg-success">In Stock</span>
+                            {% else %}
+                            <span class="badge bg-danger">Out of Stock</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Previous</a>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+                {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                </li>
+                {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Next</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="alert alert-info">
+            No plants found matching your criteria.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

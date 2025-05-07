@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ plant.name }} - Angel's Plant Shop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'products:plant_list' %}">Plants</a></li>
+            {% if plant.category %}
+            <li class="breadcrumb-item"><a href="{% url 'products:category_detail' plant.category.slug %}">{{ plant.category.name }}</a></li>
+            {% endif %}
+            <li class="breadcrumb-item active" aria-current="page">{{ plant.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Plant Images -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                {% if plant.image %}
+                <img src="{{ plant.image.url }}" class="card-img-top" alt="{{ plant.name }}">
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Plant Details -->
+        <div class="col-md-6">
+            <h1 class="mb-3">{{ plant.name }}</h1>
+            
+            <!-- Price -->
+            <div class="mb-3">
+                {% if plant.is_on_sale %}
+                <span class="text-decoration-line-through text-muted h4">${{ plant.original_price }}</span>
+                <span class="text-success h3 ms-2">${{ plant.price }}</span>
+                {% else %}
+                <span class="text-success h3">${{ plant.price }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Stock Status -->
+            <div class="mb-3">
+                {% if plant.stock > 0 %}
+                <span class="badge bg-success">In Stock</span>
+                {% else %}
+                <span class="badge bg-danger">Out of Stock</span>
+                {% endif %}
+            </div>
+
+            <!-- Plant Details -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Plant Details</h5>
+                    <ul class="list-unstyled">
+                        <li><strong>Care Level:</strong> {{ plant.get_care_level_display }}</li>
+                        <li><strong>Light Requirement:</strong> {{ plant.get_light_display }}</li>
+                        <li><strong>Pet Friendly:</strong> {% if plant.pet_friendly %}Yes{% else %}No{% endif %}</li>
+                        <li><strong>Category:</strong> {{ plant.category.name }}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Description</h5>
+                    <p class="card-text">{{ plant.description }}</p>
+                </div>
+            </div>
+
+            <!-- Add to Cart Form -->
+            {% if plant.stock > 0 %}
+            <form method="post" action="{% url 'cart:cart_add' plant.id %}" class="mb-4">
+                {% csrf_token %}
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <label for="quantity" class="form-label">Quantity:</label>
+                        <input type="number" name="quantity" id="quantity" value="1" min="1" max="{{ plant.stock }}" class="form-control" style="width: 80px;">
+                    </div>
+                    <div class="col">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </form>
+            {% endif %}
+
+            <!-- Care Instructions -->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Care Instructions</h5>
+                    <ul class="list-unstyled">
+                        <li><strong>Watering:</strong> {{ plant.watering_instructions }}</li>
+                        <li><strong>Light:</strong> {{ plant.light_instructions }}</li>
+                        <li><strong>Temperature:</strong> {{ plant.temperature_instructions }}</li>
+                        <li><strong>Humidity:</strong> {{ plant.humidity_instructions }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

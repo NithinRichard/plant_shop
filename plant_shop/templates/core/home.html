@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Angel's Plant Shop{% endblock %}
+
+{% block content %}
+<div class="jumbotron bg-light p-5 rounded">
+    <h1 class="display-4">Welcome to Angel's Plant Shop</h1>
+    <p class="lead">Discover the beauty of nature with our carefully curated collection of plants.</p>
+    <hr class="my-4">
+    <p>Browse our selection of indoor and outdoor plants, perfect for any space.</p>
+    <a class="btn btn-success btn-lg" href="{% url 'products:plant_list' %}" role="button">Shop Now</a>
+</div>
+
+{% if featured_plants %}
+<section class="my-5">
+    <h2 class="mb-4">Featured Plants</h2>
+    <div class="row">
+        {% for plant in featured_plants %}
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                {% if plant.image %}
+                <img src="{{ plant.image.url }}" class="card-img-top" alt="{{ plant.name }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ plant.name }}</h5>
+                    <p class="card-text">${{ plant.price }}</p>
+                    <a href="{% url 'products:plant_detail' plant.slug %}" class="btn btn-outline-success">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% if latest_plants %}
+<section class="my-5">
+    <h2 class="mb-4">Latest Arrivals</h2>
+    <div class="row">
+        {% for plant in latest_plants %}
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                {% if plant.image %}
+                <img src="{{ plant.image.url }}" class="card-img-top" alt="{{ plant.name }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ plant.name }}</h5>
+                    <p class="card-text">${{ plant.price }}</p>
+                    <a href="{% url 'products:plant_detail' plant.slug %}" class="btn btn-outline-success">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+{% endblock %} 

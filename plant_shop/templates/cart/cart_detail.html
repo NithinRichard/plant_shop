@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Shopping Cart - Angel's Plant Shop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Shopping Cart</h1>
+
+    {% if cart %}
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Plant</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Total</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cart %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if item.plant.image %}
+                                            <img src="{{ item.plant.image.url }}" alt="{{ item.plant.name }}" class="img-thumbnail me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                                            {% endif %}
+                                            <div>
+                                                <h6 class="mb-0">{{ item.plant.name }}</h6>
+                                                {% if item.plant.is_on_sale %}
+                                                <small class="text-muted">Sale Price</small>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <form method="post" action="{% url 'cart:cart_update' item.plant.id %}" class="d-flex align-items-center">
+                                            {% csrf_token %}
+                                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.plant.stock }}" class="form-control form-control-sm" style="width: 70px;">
+                                            <button type="submit" class="btn btn-sm btn-outline-success ms-2">Update</button>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        {% if item.plant.is_on_sale %}
+                                        <span class="text-decoration-line-through text-muted">${{ item.plant.original_price }}</span><br>
+                                        {% endif %}
+                                        <span class="text-success fw-bold">${{ item.plant.price }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold">${{ item.total_price }}</span>
+                                    </td>
+                                    <td>
+                                        <form method="post" action="{% url 'cart:cart_remove' item.plant.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Order Summary</h5>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <span class="fw-bold">${{ cart.get_total_price }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping:</span>
+                        <span class="fw-bold">${{ cart.get_shipping_cost }}</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Total:</span>
+                        <span class="fw-bold text-success">${{ cart.get_total_price_with_shipping }}</span>
+                    </div>
+                    <a href="{% url 'checkout:checkout' %}" class="btn btn-success w-100">Proceed to Checkout</a>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h5 class="card-title">Continue Shopping</h5>
+                    <a href="{% url 'products:plant_list' %}" class="btn btn-outline-success w-100">Browse Plants</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <h4 class="alert-heading">Your cart is empty!</h4>
+        <p>Looks like you haven't added any plants to your cart yet.</p>
+        <hr>
+        <a href="{% url 'products:plant_list' %}" class="btn btn-success">Start Shopping</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

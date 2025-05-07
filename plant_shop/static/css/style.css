@@ -1,0 +1,49 @@
+/* Custom styles for Angel's Plant Shop */
+
+/* Card hover effect */
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Product image container */
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+/* Jumbotron customization */
+.jumbotron {
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    padding: 2rem;
+}
+
+/* Footer styling */
+footer {
+    margin-top: auto;
+    padding: 1rem 0;
+    background-color: #f8f9fa;
+}
+
+/* Form styling */
+.form-control:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+}
+
+/* Button hover effects */
+.btn-success:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Alert message styling */
+.alert {
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+} 
