@@ -1,0 +1,1 @@
+web: gunicorn plant_shop.plant_shop.wsgi:application --bind 0.0.0.0:$PORT 
