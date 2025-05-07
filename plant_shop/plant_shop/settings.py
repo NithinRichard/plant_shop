@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+import dj_database_url
 
 # Load environment variables
 load_dotenv()
@@ -85,13 +86,14 @@ TEMPLATES = [
 WSGI_APPLICATION = 'plant_shop.plant_shop.wsgi.application'
 
 # Database
-if 'DATABASE_URL' in os.environ:
-    import dj_database_url
+DATABASE_URL = os.getenv('DATABASE_URL')
+if DATABASE_URL:
     DATABASES = {
         'default': dj_database_url.config(
-            default=os.getenv('DATABASE_URL'),
+            default=DATABASE_URL,
             conn_max_age=600,
             conn_health_checks=True,
+            ssl_require=True
         )
     }
 else:
